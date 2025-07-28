@@ -1,0 +1,32 @@
+
+*** syscall ***
+
+ULAZI:
+--------------------------------------
+$v0 (integer: 1-10) UVIJEK ZA SVE SLUČAJEVE
+$a0 (adresa)  SAMO za slučajeve 1,2,3,4 i 8
+$a1 (integer) SAMO za slučaj 8
+--------------------------------------
+
+IZLAZI:
+--------------------------------------
+$v0 POSTOJI SAMO ZA READ slucajeve 5,6,7,8
+--------------------------------------
+
+|-----------------------------------------------------------------------|
+| Service	| $v0(ULAZ)| 	  $a0(ULAZ)	    |	  $a1(ULAZ)	|
+|-----------------------------------------------------------------------|
+| print integer | 	  1| integer for print	    |		unused	|
+| print float   | 	  2| float for print	    |		unused	|
+| print double  | 	  3| double for print	    |		unused	|
+| print string  | 	  4| addr. string for print |		unused	|
+| read integer  | 	  5|		unused 	    |		unused	|
+| read float    | 	  6|		unused 	    |		unused	|
+| read double   | 	  7|		unused 	    |		unused	|
+| read string   |	  8|Addr. of Input Buff	    |max length of str. |
+| sbrk		|	  9|		amount	    |		unused	|
+| exit		|	 10|		unused	    |		unused	|
+|-----------------------------------------------------------------------|
+
+Slucaj 8 (read string) je IZNIMKA i zahtjeva 3 ulazna par.: $v0, $a0 i $a1
+Procitani string se nalazi u RAM-u na lokaciji odredjenoj sa $a0

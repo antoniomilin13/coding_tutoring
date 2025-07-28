@@ -1,0 +1,24 @@
+Logical OR
+
+0 OR 0  -> 0
+0 OR 1  -> 1
+1 OR 0  -> 1
+1 OR 1  -> 1
+
+Vidimo da samo kobinacija 0 i 0 daju 0
+sve ostale daju 1
+
+broj OR  0x00
+----------------------------
+0    OR  0x00 = 0 -> OSTAJE 0
+1    OR  0x00 = 1 -> OSTAJE 1
+#############################
+broj  OR  0x00  ->  isti broj
+#############################
+
+Primjer:  5 OR 0
+
+    101
+ OR 000
+-------
+    101  isti broj

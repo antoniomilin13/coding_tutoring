@@ -1,0 +1,113 @@
+# Upis - ispis
+	
+	.data  		# sa labelom .data oznacavamo adresu di pocinju nasi podaci u RAMu
+			#ona je unaprid odredena i uvik iznosi 0x1001 0000 (sirina 4 byte-a)
+opci_clan: 	.asciiz "Opci clan aritmetickog niza ima oblik:\n        an = a0 + n*d\n"
+upis_1_clana:	.asciiz "\nUpisite prvi clan (a0) aritmetickog niza: "
+upis_koraka: 	.asciiz "\nUpisite korak (d) za povecanje aritmetickog niza: "
+zadnji_index:	.asciiz "\nDo kojeg clana zelite ispisati red: "
+arit_niz_glasi: .asciiz "\nAritmeticki niz:\n"
+razmak:		.asciiz " "
+suma:		.asciiz "\nSuma niza je:  "
+prosjek:	.asciiz "\nProsjek niza je:  "
+
+	.globl main
+	.text		
+
+main:	
+	li $v0, 4
+	la $a0, opci_clan
+	syscall
+	
+#-------Upis prvog clana-------
+	li $v0, 4
+	la $a0, upis_1_clana
+	syscall
+	
+	li $v0, 5
+	syscall
+	move $t0, $v0   # $t0 = $v0  /  $t0 je nulti clan reda
+	
+#-------Upis koraka-------
+	li $v0, 4
+	la $a0, upis_koraka
+	syscall
+	
+	li $v0, 5
+	syscall
+	move $t1, $v0	# $t1 je korak (d)	
+	
+#-------Upis koraka-------
+	li $v0, 4
+	la $a0, zadnji_index
+	syscall
+	
+	li $v0, 5
+	syscall
+	move $t2, $v0	# $t2 je zadnji index (n)
+
+#-------Arit. niz glasi-------
+	li $v0, 4
+	la $a0, arit_niz_glasi
+	syscall
+	
+#-------RACUN------------ an = a0 + n*d  ili     a_n+1 = a_n + d
+# a0, a1, ..., an  - to NISU registri nego clnovi aritm. niza
+# $t0 - a0
+# $t1 - d
+# $t2 - n (zadnji index)
+# $t3 - an opci clan
+# $t4 - kopija od n($t2)
+# $t5 - suma arit. niza
+# $t6 - cijelobrojni prosjek arit. niza
+	
+	move $t3, $t0   # $t3 = a0
+	move $t4, $t2   # iskopirati iznos n (iz registra $t2) u $t4    /    move -> registar u registar
+	li $t5, 0	#    /    konkretan broj u registar(nemozemo reg. u reg.)
+ispis_trenutacnog_clana:
+	# 1. korak = ISPIS trenutnog clana
+	li $v0, 1
+	move $a0, $t3
+	syscall
+	
+	# 2. ISPIS razmak
+	li $v0, 4
+	la $a0, razmak
+	syscall
+	
+	# 3. korak = Izracun novog clana
+	add $t5, $t5, $t3   # nova suma -> mora se izracunati sa trenutnim clanom a ne sa slijedecim
+	add $t3, $t3, $t1   # rekurzija -> a_n+1 = a_n + d  ->  ovo mora ici nakon izracuna sume
+	sub $t4, $t4, 1     # umanjujemo brojac za 1
+	bnez $t4, ispis_trenutacnog_clana
+
+#----SUMA----
+	li $v0, 4
+	la $a0, suma
+	syscall
+
+	li $v0, 1
+	move $a0, $t5
+	syscall
+	
+#----Prosjek----
+	li $v0, 4
+	la $a0, prosjek  # "Prosjek je: "
+	syscall
+
+	# prosjek arit. niza  --> prosjek = suma/n
+	#div	div $s, $t	lo = $s/$t; hi=$s%$t
+	#primjer:	20:3 = 6.66667	->  low = 6 / high = 2
+	
+	div $t5, $t2
+	mflo $t6	#move from low (low stavljamo u zeljeni registar
+	#mtlo		 move to low (u low stavljano zeljeni registar
+	move $a0, $t6
+	#2. varijanta
+	# odma u mflo stavljamo $a0  -->  mflo $a0
+	li $v0, 1
+	syscall
+	
+#----Izlazak iz programa----	
+	li $v0, 10 				
+	syscall
